@@ -1,4 +1,5 @@
 import unittest
+
 from datetime import datetime
 from loglyzer import Loglyzer
 

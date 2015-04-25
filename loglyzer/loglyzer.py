@@ -8,12 +8,12 @@ from loglyzer.timeline import Timeline
 class Loglyzer:
     def __init__(self):
         self.__nextcur = 0
-        self.file_handler_ = None
+        self.__file_handler = None
         self.file_name = ""
 
     def __del__(self):
-        if self.file_handler_ is not None:
-            self.file_handler_.close()
+        if self.__file_handler is not None:
+            self.__file_handler.close()
 
     @staticmethod
     def __parse(line):
@@ -51,15 +51,15 @@ class Loglyzer:
 
     def load(self, file):
         if file.endswith("gz"):
-            self.file_handler_ = gzip.open(file, mode='rt')
+            self.__file_handler = gzip.open(file, mode='rt')
         else:
-            self.file_handler_ = open(file, mode='rt')
+            self.__file_handler = open(file, mode='rt')
         self.file_name = file
 
     def next(self):
-        self.file_handler_.seek(self.__nextcur)
-        line = self.file_handler_.readline()
-        self.__nextcur = self.file_handler_.tell()
+        # self.__file_handler.seek(self.__nextcur)
+        line = self.__file_handler.readline()
+        # self.__nextcur = self.__file_handler.tell()
         return self.__parse(line)
 
     def at(self, lineno):
@@ -67,9 +67,10 @@ class Loglyzer:
         return self.__parse(line)
 
     def duration(self, start, end):
-        self.file_handler_.seek(0)
         return Timeline(self, start, end)
 
     def all(self):
-        self.file_handler_.seek(0)
         return Timeline(self, 0, 0)
+
+    def reset(self):
+        self.__file_handler.seek(0)

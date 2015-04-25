@@ -1,6 +1,7 @@
 class Timeline:
     def __init__(self, log, start, end):
         self.__data = list()
+        log.reset()
         while True:
             record = log.next()
             if record.empty():
