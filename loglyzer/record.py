@@ -27,9 +27,12 @@ class Record:
                   self.http_referer, self.http_user_agent)
 
     def date(self):
-        dt = datetime.strptime(self.time_local,
-                               "%d/%b/%Y:%H:%M:%S %z")
-        return dt
+        try:
+            dt = datetime.strptime(self.time_local,
+                                   "%d/%b/%Y:%H:%M:%S %z")
+            return dt
+        except ValueError:
+            return datetime.now()
 
     def method(self):
         parts = self.request.split(' ')

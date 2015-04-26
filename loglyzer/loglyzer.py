@@ -9,6 +9,7 @@ class Loglyzer:
     def __init__(self):
         self.__nextcur = 0
         self.__file_handler = None
+        self.__opened = False
         self.file_name = ""
 
     def __del__(self):
@@ -50,17 +51,24 @@ class Loglyzer:
         return r
 
     def load(self, file):
-        if file.endswith("gz"):
-            self.__file_handler = gzip.open(file, mode='rt')
-        else:
-            self.__file_handler = open(file, mode='rt')
-        self.file_name = file
+        try:
+            if file.endswith("gz"):
+                self.__file_handler = gzip.open(file, mode='rt')
+            else:
+                self.__file_handler = open(file, mode='rt')
+            self.file_name = file
+            self.__opened = True
+        except FileNotFoundError:
+            self.__opened = False
 
     def next(self):
-        # self.__file_handler.seek(self.__nextcur)
-        line = self.__file_handler.readline()
-        # self.__nextcur = self.__file_handler.tell()
-        return self.__parse(line)
+        if self.__opened:
+            # self.__file_handler.seek(self.__nextcur)
+            line = self.__file_handler.readline()
+            # self.__nextcur = self.__file_handler.tell()
+            return self.__parse(line)
+        else:
+            return self.__parse("")
 
     def at(self, lineno):
         line = linecache.getline(self.file_name, lineno)
@@ -73,4 +81,5 @@ class Loglyzer:
         return Timeline(self, 0, 0)
 
     def reset(self):
-        self.__file_handler.seek(0)
+        if self.__opened:
+            self.__file_handler.seek(0)
